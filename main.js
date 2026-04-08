@@ -20,9 +20,9 @@ const { updateElectronApp } = require('update-electron-app');
 updateElectronApp({
   updateSource: {
     type: 'github',
-    repo: 'your-github-username/your-repo-name' // 替换成你的仓库
+    repo: 'zll123456354/electron-sqlite' // 替换成你的仓库
   },
-  updateInterval: '1 hour', // 每隔1小时检查更新
+  updateInterval: '5 minutes', // 每隔1小时检查更新
   notifyUser: true // 下载完成后自动弹窗提示
 });
 
