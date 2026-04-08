@@ -1,0 +1,55 @@
+{
+  "name": "electron-sqlite-login",
+  "version": "1.0.0",
+  "description": "用户管理系统",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder",
+    "dist:dir": "electron-builder --dir"
+  },
+  "author": "Your Name",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "sql.js": "^1.10.3",
+    "update-electron-app": "^3.1.2"
+  },
+  "devDependencies": {
+    "electron": "^27.3.11",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.example.useradmin",
+    "productName": "用户管理系统",
+    "directories": {
+      "output": "dist"
+    },
+    "asar": true,
+    "asarUnpack": [
+      "node_modules/sql.js/**/*"
+    ],
+    "files": [
+      "**/*",
+      "!*.md",
+      "!*.log",
+      "!.gitignore",
+      "!node_modules/.cache/**",
+      "!dist/**"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "build/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowElevation": true,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "用户管理系统",
+      "perMachine": true,
+      "uninstallDisplayName": "用户管理系统 ${version}"
+    }
+  }
+}
