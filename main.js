@@ -13,15 +13,18 @@ const {
 
 let mainWindow;
 
-const { autoUpdater } = require("electron-updater");
-
-// 在窗口创建后调用更新检测
-function createWindow() {
-  mainWindow = new BrowserWindow({
-    /* 窗口配置 */
-  });
-  setupAutoUpdater(); // 初始化自动更新
+function sendUpdateStatus(msg) {
+  if (
+    mainWindow &&
+    !mainWindow.isDestroyed() &&
+    mainWindow.webContents &&
+    !mainWindow.webContents.isDestroyed()
+  ) {
+    mainWindow.webContents.send("update-status", msg);
+  }
 }
+
+const { autoUpdater } = require("electron-updater");
 
 // 👇 单独初始化更新（更清晰）
 function setupAutoUpdater() {
@@ -32,27 +35,25 @@ function setupAutoUpdater() {
   autoUpdater.checkForUpdates();
 
   autoUpdater.on("checking-for-update", () => {
-    mainWindow.webContents.send("update-status", "正在检查更新...");
+    sendUpdateStatus("正在检查更新...");
   });
 
   autoUpdater.on("update-available", () => {
-    mainWindow.webContents.send("update-status", "发现新版本，正在下载...");
+    sendUpdateStatus("发现新版本，正在下载...");
   });
 
   autoUpdater.on("update-not-available", () => {
-    mainWindow.webContents.send("update-status", "当前已是最新版本");
+    sendUpdateStatus("当前已是最新版本");
   });
 
-  // 👇 下载进度（很重要）
   autoUpdater.on("download-progress", (progress) => {
     const percent = Math.floor(progress.percent);
-    mainWindow.webContents.send("update-status", `下载进度：${percent}%`);
+    sendUpdateStatus(`下载进度：${percent}%`);
   });
 
   autoUpdater.on("update-downloaded", () => {
-    mainWindow.webContents.send("update-status", "下载完成，准备安装");
+    sendUpdateStatus("下载完成，准备安装");
 
-    // ❗建议延迟一下，避免闪退
     setTimeout(() => {
       autoUpdater.quitAndInstall();
     }, 3000);
@@ -60,14 +61,9 @@ function setupAutoUpdater() {
 
   autoUpdater.on("error", (err) => {
     console.error("更新错误:", err);
-    mainWindow.webContents.send("update-status", "更新出错");
+    sendUpdateStatus("更新出错");
   });
 }
-
-app.whenReady().then(() => {
-  createWindow();
-  setupAutoUpdater(); // ✅ 放这里才对
-});
 
 // 判断是否为开发模式
 const isDev =
@@ -107,6 +103,7 @@ function createWindow() {
 app.whenReady().then(async () => {
   await initialize();
   createWindow();
+  setupAutoUpdater();
 });
 
 app.on("window-all-closed", () => {
@@ -180,11 +177,11 @@ ipcMain.on("trigger-update", (event) => {
   setupAutoUpdater();
 });
 ipcMain.on("update:checkNow", () => {
-  if (!mainWindow) return;
+  if (!mainWindow || mainWindow.isDestroyed()) return;
   if (!app.isPackaged) {
-    mainWindow.webContents.send("update-status", "当前为开发环境，跳过更新检查");
+    sendUpdateStatus("当前为开发环境，跳过更新检查");
     return;
   }
-  mainWindow.webContents.send("update-status", "正在检查更新...");
+  sendUpdateStatus("正在检查更新...");
   autoUpdater.checkForUpdates();
 });
