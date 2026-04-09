@@ -259,7 +259,7 @@ async function loginUser(username, password) {
   }
 
   try {
-    const sql = "SELECT * FROM users WHERE username = ?";
+    const sql = "SELECT id, username, password, status, created_at, last_login FROM users WHERE username = ?";
     const result = db.exec(sql, [username]);
 
     if (result.length === 0 || result[0].values.length === 0) {
