@@ -26,8 +26,10 @@
     "productName": "用户管理系统",
     "publish": [
       {
-        "provider": "generic",
-        "url": "https://github.com/zll123456354/electron-sqlite/releases/latest/download/"
+        "provider": "github",
+        "owner": "zll123456354",
+        "repo": "electron-sqlite",
+        "releaseType": "release"
       }
     ],
     "directories": {

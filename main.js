@@ -13,35 +13,61 @@ const {
 
 let mainWindow;
 
-const { autoUpdater } = require('electron-updater');
+const { autoUpdater } = require("electron-updater");
 
 // 在窗口创建后调用更新检测
 function createWindow() {
-  mainWindow = new BrowserWindow({ /* 窗口配置 */ });
+  mainWindow = new BrowserWindow({
+    /* 窗口配置 */
+  });
   setupAutoUpdater(); // 初始化自动更新
 }
 
+// 👇 单独初始化更新（更清晰）
 function setupAutoUpdater() {
-  autoUpdater.checkForUpdatesAndNotify();
-  
-  autoUpdater.on('update-available', () => {
-    mainWindow.webContents.send('update-status', '检测到新版本，正在下载...');
+  // ❗只在生产环境执行
+  if (!app.isPackaged) return;
+
+  // 检查更新
+  autoUpdater.checkForUpdates();
+
+  autoUpdater.on("checking-for-update", () => {
+    mainWindow.webContents.send("update-status", "正在检查更新...");
   });
-  
-  autoUpdater.on('update-not-available', () => {
-    mainWindow.webContents.send('update-status', '已是最新版本，无需更新');
+
+  autoUpdater.on("update-available", () => {
+    mainWindow.webContents.send("update-status", "发现新版本，正在下载...");
   });
-  
-  autoUpdater.on('update-downloaded', () => {
-    mainWindow.webContents.send('update-status', '更新下载完成，准备安装');
-    autoUpdater.quitAndInstall();
+
+  autoUpdater.on("update-not-available", () => {
+    mainWindow.webContents.send("update-status", "当前已是最新版本");
   });
-  
-  autoUpdater.on('error', (err) => {
-    mainWindow.webContents.send('update-status', '检查更新时发生错误');
-    console.error('更新错误:', err);
+
+  // 👇 下载进度（很重要）
+  autoUpdater.on("download-progress", (progress) => {
+    const percent = Math.floor(progress.percent);
+    mainWindow.webContents.send("update-status", `下载进度：${percent}%`);
+  });
+
+  autoUpdater.on("update-downloaded", () => {
+    mainWindow.webContents.send("update-status", "下载完成，准备安装");
+
+    // ❗建议延迟一下，避免闪退
+    setTimeout(() => {
+      autoUpdater.quitAndInstall();
+    }, 3000);
+  });
+
+  autoUpdater.on("error", (err) => {
+    console.error("更新错误:", err);
+    mainWindow.webContents.send("update-status", "更新出错");
   });
 }
+
+app.whenReady().then(() => {
+  createWindow();
+  setupAutoUpdater(); // ✅ 放这里才对
+});
 
 // 判断是否为开发模式
 const isDev =
@@ -150,6 +176,15 @@ ipcMain.handle("users:resetPassword", async (event, userId, newPassword) => {
   }
 });
 // 监听渲染进程的更新请求
-ipcMain.on('trigger-update', (event) => {
-  setupAutoUpdater(); // 调用更新函数
+ipcMain.on("trigger-update", (event) => {
+  setupAutoUpdater();
+});
+ipcMain.on("update:checkNow", () => {
+  if (!mainWindow) return;
+  if (!app.isPackaged) {
+    mainWindow.webContents.send("update-status", "当前为开发环境，跳过更新检查");
+    return;
+  }
+  mainWindow.webContents.send("update-status", "正在检查更新...");
+  autoUpdater.checkForUpdates();
 });

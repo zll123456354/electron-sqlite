@@ -95,6 +95,42 @@ body {
     background: #d32f2f;
 }
 
+.update-section {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-right: 15px;
+}
+
+.update-status {
+    font-size: 13px;
+    color: #666;
+    max-width: 260px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.btn-update {
+    padding: 6px 16px;
+    background: #2196f3;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: background 0.3s;
+}
+
+.btn-update:hover {
+    background: #1976d2;
+}
+
+.btn-update:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
 /* 统计卡片 */
 .stats-grid {
     display: grid;

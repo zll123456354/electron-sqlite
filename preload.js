@@ -21,4 +21,6 @@ contextBridge.exposeInMainWorld("electronAPI", {
     ),
   resetPassword: (userId, newPassword) =>
     ipcRenderer.invoke("users:resetPassword", userId, newPassword),
+  checkForUpdates: () => ipcRenderer.send("update:checkNow"),
+  onUpdateStatus: (cb) => ipcRenderer.on("update-status", (_e, msg) => cb(msg)),
 });

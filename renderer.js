@@ -410,6 +410,21 @@ document.addEventListener("DOMContentLoaded", () => {
   // 退出登录
   document.getElementById("admin-logout").addEventListener("click", logout);
 
+  document.getElementById("check-update-btn").addEventListener("click", () => {
+    const btn = document.getElementById("check-update-btn");
+    btn.disabled = true;
+    btn.textContent = "检查中...";
+    window.electronAPI.checkForUpdates();
+  });
+
+  window.electronAPI.onUpdateStatus((msg) => {
+    const statusText = document.getElementById("update-status-text");
+    statusText.textContent = msg;
+    const btn = document.getElementById("check-update-btn");
+    btn.disabled = false;
+    btn.textContent = "检查更新";
+  });
+
   // 点击模态框背景关闭
   document.querySelectorAll(".modal").forEach((modal) => {
     modal.addEventListener("click", (e) => {
