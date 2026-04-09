@@ -13,18 +13,30 @@ const {
 
 let mainWindow;
 
-// 1. 引入 update-electron-app
-const { updateElectronApp } = require("update-electron-app");
+const { autoUpdater } = require('electron-updater');
 
-// 2. 调用它，并配置你的 GitHub 仓库
-updateElectronApp({
-  updateSource: {
-    type: "generic",
-    url: "https://github.com/zll123456354/electron-sqlite/releases/latest/download/",
-  },
-  updateInterval: "5 minutes", // 每隔1小时检查更新
-  notifyUser: true, // 下载完成后自动弹窗提示
-});
+// 在窗口创建后调用更新检测
+function createWindow() {
+  mainWindow = new BrowserWindow({ /* 窗口配置 */ });
+  setupAutoUpdater(); // 初始化自动更新
+}
+
+function setupAutoUpdater() {
+  // 自动检查更新并通知用户
+  autoUpdater.checkForUpdatesAndNotify();
+  
+  // 监听更新可用事件
+  autoUpdater.on('update-available', () => {
+    mainWindow.webContents.send('update-status', '检测到新版本，正在下载...');
+  });
+  
+  // 监听更新下载完成事件
+  autoUpdater.on('update-downloaded', () => {
+    mainWindow.webContents.send('update-status', '更新下载完成，准备安装');
+    // 退出应用并安装更新
+    autoUpdater.quitAndInstall();
+  });
+}
 
 // 判断是否为开发模式
 const isDev =
@@ -131,4 +143,8 @@ ipcMain.handle("users:resetPassword", async (event, userId, newPassword) => {
   } catch (error) {
     return { success: false, message: error.message };
   }
+});
+// 监听渲染进程的更新请求
+ipcMain.on('trigger-update', (event) => {
+  setupAutoUpdater(); // 调用更新函数
 });
