@@ -13,6 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^2.4.3",
+    "electron-updater": "^6.6.2",
     "sql.js": "^1.10.3",
     "update-electron-app": "^3.1.2"
   },
