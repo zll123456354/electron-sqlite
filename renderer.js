@@ -97,35 +97,55 @@ async function loadUsers() {
     .join("");
 }
 
-// 切换用户状态
-async function toggleUserStatus(userId, newStatus) {
+// 切换用户状态 - 显示确认
+function toggleUserStatus(userId, newStatus) {
   const action = newStatus === "active" ? "启用" : "禁用";
-  if (!confirm(`确定要${action}该用户吗？`)) return;
+  document.getElementById("message-modal-title").textContent = "确认" + action;
+  const contentBox = document.getElementById("message-modal-content");
+  contentBox.textContent = `确定要${action}该用户吗？`;
+  contentBox.className = "message-box";
+  document.getElementById("message-modal").classList.add("active");
+  document.getElementById("message-modal").dataset.confirmAction = "toggleStatus";
+  document.getElementById("message-modal").dataset.userId = userId;
+  document.getElementById("message-modal").dataset.newStatus = newStatus;
+}
 
+// 确认切换用户状态
+async function confirmToggleUserStatus(userId, newStatus) {
   const result = await window.electronAPI.toggleUserStatus(userId, newStatus);
   if (result.success) {
-    alert(result.message);
+    showMessage("操作成功", result.message, false);
     await loadUsers();
   } else {
-    alert("操作失败: " + result.message);
+    showMessage("操作失败", result.message, true);
   }
 }
 
-// 删除用户
-async function deleteUserAccount(userId, username) {
+// 删除用户 - 显示确认
+function deleteUserAccount(userId, username) {
   if (userId === currentUser.id) {
-    alert("不能删除当前登录的账号！");
+    showMessage("操作失败", "不能删除当前登录的账号！", true);
     return;
   }
 
-  if (!confirm(`确定要删除用户 "${username}" 吗？此操作不可恢复！`)) return;
+  document.getElementById("message-modal-title").textContent = "确认删除";
+  const contentBox = document.getElementById("message-modal-content");
+  contentBox.textContent = `确定要删除用户 "${username}" 吗？此操作不可恢复！`;
+  contentBox.className = "message-box";
+  document.getElementById("message-modal").classList.add("active");
+  document.getElementById("message-modal").dataset.confirmAction = "deleteUser";
+  document.getElementById("message-modal").dataset.userId = userId;
+  document.getElementById("message-modal").dataset.username = username;
+}
 
+// 确认删除用户
+async function confirmDeleteUser(userId, username) {
   const result = await window.electronAPI.deleteUser(userId);
   if (result.success) {
-    alert(result.message);
+    showMessage("删除成功", result.message, false);
     await loadUsers();
   } else {
-    alert("删除失败: " + result.message);
+    showMessage("删除失败", result.message, true);
   }
 }
 
@@ -228,6 +248,15 @@ async function submitResetPassword() {
   }
 }
 
+// 显示消息提示
+function showMessage(title, message, isError = true) {
+  document.getElementById("message-modal-title").textContent = title;
+  const contentBox = document.getElementById("message-modal-content");
+  contentBox.textContent = message;
+  contentBox.className = isError ? "message-box error" : "message-box success";
+  document.getElementById("message-modal").classList.add("active");
+}
+
 // 关闭模态框
 function closeModal(modalId) {
   document.getElementById(modalId).classList.remove("active");
@@ -235,11 +264,35 @@ function closeModal(modalId) {
 
 // 退出登录
 function logout() {
-  if (confirm("确定要退出登录吗？")) {
+  document.getElementById("message-modal-title").textContent = "退出登录";
+  const contentBox = document.getElementById("message-modal-content");
+  contentBox.textContent = "确定要退出登录吗？";
+  contentBox.className = "message-box";
+  document.getElementById("message-modal").classList.add("active");
+  document.getElementById("message-modal").dataset.confirmAction = "logout";
+}
+
+function executeConfirmAction() {
+  const modal = document.getElementById("message-modal");
+  const action = modal.dataset.confirmAction;
+  closeModal('message-modal');
+  if (action === "logout") {
     localStorage.removeItem("currentUser");
     currentUser = null;
     showAuthSection();
+  } else if (action === "toggleStatus") {
+    const userId = parseInt(modal.dataset.userId);
+    const newStatus = modal.dataset.newStatus;
+    confirmToggleUserStatus(userId, newStatus);
+  } else if (action === "deleteUser") {
+    const userId = parseInt(modal.dataset.userId);
+    const username = modal.dataset.username;
+    confirmDeleteUser(userId, username);
   }
+  modal.dataset.confirmAction = "";
+  modal.dataset.userId = "";
+  modal.dataset.newStatus = "";
+  modal.dataset.username = "";
 }
 
 // ==================== 登录相关 ====================
@@ -377,3 +430,4 @@ window.openResetPasswordModal = openResetPasswordModal;
 window.submitChangePassword = submitChangePassword;
 window.submitResetPassword = submitResetPassword;
 window.closeModal = closeModal;
+window.executeModalConfirm = executeConfirmAction;

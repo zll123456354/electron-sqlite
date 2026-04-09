@@ -247,6 +247,10 @@ body {
     max-width: 400px;
 }
 
+.modal-content.modal-small {
+    max-width: 320px;
+}
+
 .modal-header {
     display: flex;
     justify-content: space-between;

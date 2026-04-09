@@ -22,19 +22,24 @@ function createWindow() {
 }
 
 function setupAutoUpdater() {
-  // 自动检查更新并通知用户
   autoUpdater.checkForUpdatesAndNotify();
   
-  // 监听更新可用事件
   autoUpdater.on('update-available', () => {
     mainWindow.webContents.send('update-status', '检测到新版本，正在下载...');
   });
   
-  // 监听更新下载完成事件
+  autoUpdater.on('update-not-available', () => {
+    mainWindow.webContents.send('update-status', '已是最新版本，无需更新');
+  });
+  
   autoUpdater.on('update-downloaded', () => {
     mainWindow.webContents.send('update-status', '更新下载完成，准备安装');
-    // 退出应用并安装更新
     autoUpdater.quitAndInstall();
+  });
+  
+  autoUpdater.on('error', (err) => {
+    mainWindow.webContents.send('update-status', '检查更新时发生错误');
+    console.error('更新错误:', err);
   });
 }
 
