@@ -1,6 +1,45 @@
-// 当前登录用户
+﻿// 当前登录用户
 let currentUser = null;
 let currentResetUserId = null;
+
+const messageClasses = {
+  hidden:
+    "message-box hidden mt-4 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-600",
+  neutral:
+    "message-box mt-4 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-600",
+  success:
+    "message-box mt-4 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700",
+  error:
+    "message-box mt-4 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700",
+};
+
+function hideMessageBox(el) {
+  if (!el) return;
+  el.textContent = "";
+  el.className = messageClasses.hidden;
+}
+
+function setMessageBox(el, type, text) {
+  if (!el) return;
+  if (typeof text === "string") {
+    el.textContent = text;
+  }
+  el.className = messageClasses[type] || messageClasses.neutral;
+}
+
+function openModal(modalId) {
+  const modal = document.getElementById(modalId);
+  if (!modal) return;
+  modal.classList.remove("hidden");
+  modal.classList.add("flex");
+}
+
+function closeModal(modalId) {
+  const modal = document.getElementById(modalId);
+  if (!modal) return;
+  modal.classList.add("hidden");
+  modal.classList.remove("flex");
+}
 
 // 初始化
 function init() {
@@ -24,13 +63,11 @@ async function showAdminSection() {
   document.getElementById("auth-section").style.display = "none";
   document.getElementById("admin-section").style.display = "block";
 
-  // 更新用户信息
   document.getElementById("admin-avatar").textContent = currentUser.username
     .charAt(0)
     .toUpperCase();
   document.getElementById("admin-username").textContent = currentUser.username;
 
-  // 加载用户列表
   await loadUsers();
 }
 
@@ -39,7 +76,6 @@ async function loadUsers() {
   const users = await window.electronAPI.getAllUsers();
   const tbody = document.getElementById("users-table-body");
 
-  // 更新统计数据
   const totalUsers = users.length;
   const activeUsers = users.filter(
     (u) => u.status === "active" || !u.status,
@@ -52,48 +88,64 @@ async function loadUsers() {
 
   if (users.length === 0) {
     tbody.innerHTML = `
-            <tr>
-                <td colspan="6">
-                    <div class="empty-state">
-                        <div>📭</div>
-                        <p>暂无用户数据</p>
-                    </div>
-                </td>
-            </tr>
-        `;
+      <tr>
+        <td colspan="6" class="px-6 py-10">
+          <div class="flex flex-col items-center gap-2 text-slate-400">
+            <div class="text-3xl">📭</div>
+            <p class="text-sm">暂无用户数据</p>
+          </div>
+        </td>
+      </tr>
+    `;
     return;
   }
 
+  const badgeBase =
+    "inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold";
+  const badgeActive = `${badgeBase} bg-emerald-100 text-emerald-700`;
+  const badgeDisabled = `${badgeBase} bg-rose-100 text-rose-700`;
+
+  const actionBase =
+    "inline-flex items-center rounded-lg px-3 py-1.5 text-xs font-semibold transition";
+  const actionPrimary = `${actionBase} bg-indigo-500 text-white hover:bg-indigo-600`;
+  const actionDanger = `${actionBase} bg-rose-500 text-white hover:bg-rose-600`;
+  const actionWarning = `${actionBase} bg-amber-500 text-white hover:bg-amber-600`;
+  const actionSuccess = `${actionBase} bg-emerald-500 text-white hover:bg-emerald-600`;
+
   tbody.innerHTML = users
-    .map(
-      (user) => `
-        <tr>
-            <td>${user.id}</td>
-            <td>${user.username}</td>
-            <td>
-                <span class="status-badge ${user.status === "disabled" ? "status-disabled" : "status-active"}">
-                    ${user.status === "disabled" ? "禁用" : "启用"}
-                </span>
-            </td>
-            <td>${user.created_at ? new Date(user.created_at).toLocaleString("zh-CN") : "-"}</td>
-            <td>${user.last_login ? new Date(user.last_login).toLocaleString("zh-CN") : "从未登录"}</td>
-            <td>
-                <div class="action-buttons">
-                    <button class="btn ${user.status === "disabled" ? "btn-success" : "btn-warning"}" 
-                            onclick="toggleUserStatus(${user.id}, '${user.status === "disabled" ? "active" : "disabled"}')">
-                        ${user.status === "disabled" ? "启用" : "禁用"}
-                    </button>
-                    <button class="btn btn-primary" onclick="openResetPasswordModal(${user.id}, '${user.username}')">
-                        重置密码
-                    </button>
-                    <button class="btn btn-danger" onclick="deleteUserAccount(${user.id}, '${user.username}')">
-                        删除
-                    </button>
-                </div>
-            </td>
+    .map((user) => {
+      const isDisabled = user.status === "disabled";
+      return `
+        <tr class="hover:bg-slate-50 transition">
+          <td class="px-4 py-3">${user.id}</td>
+          <td class="px-4 py-3 font-medium text-slate-800">${user.username}</td>
+          <td class="px-4 py-3">
+            <span class="${isDisabled ? badgeDisabled : badgeActive}">
+              ${isDisabled ? "禁用" : "启用"}
+            </span>
+          </td>
+          <td class="px-4 py-3 text-slate-500">
+            ${user.created_at ? new Date(user.created_at).toLocaleString("zh-CN") : "-"}
+          </td>
+          <td class="px-4 py-3 text-slate-500">
+            ${user.last_login ? new Date(user.last_login).toLocaleString("zh-CN") : "从未登录"}
+          </td>
+          <td class="px-4 py-3">
+            <div class="flex flex-wrap gap-2">
+              <button class="${isDisabled ? actionSuccess : actionWarning}" onclick="toggleUserStatus(${user.id}, '${isDisabled ? "active" : "disabled"}')">
+                ${isDisabled ? "启用" : "禁用"}
+              </button>
+              <button class="${actionPrimary}" onclick="openResetPasswordModal(${user.id}, '${user.username}')">
+                重置密码
+              </button>
+              <button class="${actionDanger}" onclick="deleteUserAccount(${user.id}, '${user.username}')">
+                删除
+              </button>
+            </div>
+          </td>
         </tr>
-    `,
-    )
+      `;
+    })
     .join("");
 }
 
@@ -103,11 +155,11 @@ function toggleUserStatus(userId, newStatus) {
   document.getElementById("message-modal-title").textContent = "确认" + action;
   const contentBox = document.getElementById("message-modal-content");
   contentBox.textContent = `确定要${action}该用户吗？`;
-  contentBox.className = "message-box";
-  document.getElementById("message-modal").classList.add("active");
+  contentBox.className = messageClasses.neutral;
   document.getElementById("message-modal").dataset.confirmAction = "toggleStatus";
   document.getElementById("message-modal").dataset.userId = userId;
   document.getElementById("message-modal").dataset.newStatus = newStatus;
+  openModal("message-modal");
 }
 
 // 确认切换用户状态
@@ -130,12 +182,12 @@ function deleteUserAccount(userId, username) {
 
   document.getElementById("message-modal-title").textContent = "确认删除";
   const contentBox = document.getElementById("message-modal-content");
-  contentBox.textContent = `确定要删除用户 "${username}" 吗？此操作不可恢复！`;
-  contentBox.className = "message-box";
-  document.getElementById("message-modal").classList.add("active");
+  contentBox.textContent = `确定要删除用户“${username}”吗？此操作不可恢复！`;
+  contentBox.className = messageClasses.neutral;
   document.getElementById("message-modal").dataset.confirmAction = "deleteUser";
   document.getElementById("message-modal").dataset.userId = userId;
   document.getElementById("message-modal").dataset.username = username;
+  openModal("message-modal");
 }
 
 // 确认删除用户
@@ -154,8 +206,8 @@ function openChangePasswordModal() {
   document.getElementById("modal-old-password").value = "";
   document.getElementById("modal-new-password").value = "";
   document.getElementById("modal-confirm-password").value = "";
-  document.getElementById("modal-message").className = "message-box";
-  document.getElementById("change-password-modal").classList.add("active");
+  hideMessageBox(document.getElementById("modal-message"));
+  openModal("change-password-modal");
 }
 
 // 提交修改密码
@@ -168,20 +220,17 @@ async function submitChangePassword() {
   const messageBox = document.getElementById("modal-message");
 
   if (!oldPassword || !newPassword || !confirmPassword) {
-    messageBox.textContent = "请填写所有字段";
-    messageBox.className = "message-box error";
+    setMessageBox(messageBox, "error", "请填写所有字段");
     return;
   }
 
   if (newPassword.length < 6) {
-    messageBox.textContent = "新密码至少6个字符";
-    messageBox.className = "message-box error";
+    setMessageBox(messageBox, "error", "新密码至少6个字符");
     return;
   }
 
   if (newPassword !== confirmPassword) {
-    messageBox.textContent = "两次输入的新密码不一致";
-    messageBox.className = "message-box error";
+    setMessageBox(messageBox, "error", "两次输入的新密码不一致");
     return;
   }
 
@@ -192,14 +241,12 @@ async function submitChangePassword() {
   );
 
   if (result.success) {
-    messageBox.textContent = result.message;
-    messageBox.className = "message-box success";
+    setMessageBox(messageBox, "success", result.message);
     setTimeout(() => {
       closeModal("change-password-modal");
     }, 1000);
   } else {
-    messageBox.textContent = result.message;
-    messageBox.className = "message-box error";
+    setMessageBox(messageBox, "error", result.message);
   }
 }
 
@@ -207,10 +254,10 @@ async function submitChangePassword() {
 function openResetPasswordModal(userId, username) {
   currentResetUserId = userId;
   document.getElementById("reset-new-password").value = "";
-  document.getElementById("reset-modal-message").className = "message-box";
+  hideMessageBox(document.getElementById("reset-modal-message"));
   document.querySelector("#reset-password-modal .modal-header h3").textContent =
     `重置密码 - ${username}`;
-  document.getElementById("reset-password-modal").classList.add("active");
+  openModal("reset-password-modal");
 }
 
 // 提交重置密码
@@ -219,14 +266,12 @@ async function submitResetPassword() {
   const messageBox = document.getElementById("reset-modal-message");
 
   if (!newPassword) {
-    messageBox.textContent = "请输入新密码";
-    messageBox.className = "message-box error";
+    setMessageBox(messageBox, "error", "请输入新密码");
     return;
   }
 
   if (newPassword.length < 6) {
-    messageBox.textContent = "新密码至少6个字符";
-    messageBox.className = "message-box error";
+    setMessageBox(messageBox, "error", "新密码至少6个字符");
     return;
   }
 
@@ -236,15 +281,13 @@ async function submitResetPassword() {
   );
 
   if (result.success) {
-    messageBox.textContent = result.message;
-    messageBox.className = "message-box success";
+    setMessageBox(messageBox, "success", result.message);
     setTimeout(() => {
       closeModal("reset-password-modal");
       loadUsers();
     }, 1000);
   } else {
-    messageBox.textContent = result.message;
-    messageBox.className = "message-box error";
+    setMessageBox(messageBox, "error", result.message);
   }
 }
 
@@ -253,13 +296,8 @@ function showMessage(title, message, isError = true) {
   document.getElementById("message-modal-title").textContent = title;
   const contentBox = document.getElementById("message-modal-content");
   contentBox.textContent = message;
-  contentBox.className = isError ? "message-box error" : "message-box success";
-  document.getElementById("message-modal").classList.add("active");
-}
-
-// 关闭模态框
-function closeModal(modalId) {
-  document.getElementById(modalId).classList.remove("active");
+  contentBox.className = isError ? messageClasses.error : messageClasses.success;
+  openModal("message-modal");
 }
 
 // 退出登录
@@ -267,15 +305,15 @@ function logout() {
   document.getElementById("message-modal-title").textContent = "退出登录";
   const contentBox = document.getElementById("message-modal-content");
   contentBox.textContent = "确定要退出登录吗？";
-  contentBox.className = "message-box";
-  document.getElementById("message-modal").classList.add("active");
+  contentBox.className = messageClasses.neutral;
   document.getElementById("message-modal").dataset.confirmAction = "logout";
+  openModal("message-modal");
 }
 
 function executeConfirmAction() {
   const modal = document.getElementById("message-modal");
   const action = modal.dataset.confirmAction;
-  closeModal('message-modal');
+  closeModal("message-modal");
   if (action === "logout") {
     localStorage.removeItem("currentUser");
     currentUser = null;
@@ -298,25 +336,31 @@ function executeConfirmAction() {
 // ==================== 登录相关 ====================
 
 document.addEventListener("DOMContentLoaded", () => {
+  const tabButtons = document.querySelectorAll(".tab-btn");
+  const setActiveTab = (btn) => {
+    tabButtons.forEach((b) => {
+      b.classList.remove("bg-indigo-600", "text-white", "shadow");
+      b.classList.add("text-slate-600");
+    });
+    btn.classList.remove("text-slate-600");
+    btn.classList.add("bg-indigo-600", "text-white", "shadow");
+  };
+
   // 标签页切换
-  document.querySelectorAll(".tab-btn").forEach((btn) => {
+  tabButtons.forEach((btn) => {
     btn.addEventListener("click", () => {
       const tab = btn.dataset.tab;
-
-      document
-        .querySelectorAll(".tab-btn")
-        .forEach((b) => b.classList.remove("active"));
-      btn.classList.add("active");
+      setActiveTab(btn);
 
       if (tab === "login") {
-        document.getElementById("login-form").style.display = "block";
-        document.getElementById("register-form").style.display = "none";
+        document.getElementById("login-form").classList.remove("hidden");
+        document.getElementById("register-form").classList.add("hidden");
       } else {
-        document.getElementById("login-form").style.display = "none";
-        document.getElementById("register-form").style.display = "block";
+        document.getElementById("login-form").classList.add("hidden");
+        document.getElementById("register-form").classList.remove("hidden");
       }
 
-      document.getElementById("auth-message").className = "message-box";
+      hideMessageBox(document.getElementById("auth-message"));
     });
   });
 
@@ -329,8 +373,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const messageBox = document.getElementById("auth-message");
 
       if (!username || !password) {
-        messageBox.textContent = "请输入用户名和密码";
-        messageBox.className = "message-box error";
+        setMessageBox(messageBox, "error", "请输入用户名和密码");
         return;
       }
 
@@ -339,12 +382,10 @@ document.addEventListener("DOMContentLoaded", () => {
       if (result.success) {
         currentUser = result.user;
         localStorage.setItem("currentUser", JSON.stringify(result.user));
-        messageBox.textContent = result.message;
-        messageBox.className = "message-box success";
+        setMessageBox(messageBox, "success", result.message);
         setTimeout(() => showAdminSection(), 500);
       } else {
-        messageBox.textContent = result.message;
-        messageBox.className = "message-box error";
+        setMessageBox(messageBox, "error", result.message);
       }
     });
 
@@ -362,41 +403,35 @@ document.addEventListener("DOMContentLoaded", () => {
       const messageBox = document.getElementById("auth-message");
 
       if (!username || !password || !confirmPassword) {
-        messageBox.textContent = "请填写所有字段";
-        messageBox.className = "message-box error";
+        setMessageBox(messageBox, "error", "请填写所有字段");
         return;
       }
 
       if (username.length < 3) {
-        messageBox.textContent = "用户名至少3个字符";
-        messageBox.className = "message-box error";
+        setMessageBox(messageBox, "error", "用户名至少3个字符");
         return;
       }
 
       if (password.length < 6) {
-        messageBox.textContent = "密码至少6个字符";
-        messageBox.className = "message-box error";
+        setMessageBox(messageBox, "error", "密码至少6个字符");
         return;
       }
 
       if (password !== confirmPassword) {
-        messageBox.textContent = "两次输入的密码不一致";
-        messageBox.className = "message-box error";
+        setMessageBox(messageBox, "error", "两次输入的密码不一致");
         return;
       }
 
       const result = await window.electronAPI.register(username, password);
 
       if (result.success) {
-        messageBox.textContent = result.message;
-        messageBox.className = "message-box success";
+        setMessageBox(messageBox, "success", result.message);
         setTimeout(() => {
           document.querySelector('[data-tab="login"]').click();
           document.getElementById("login-username").value = username;
         }, 1000);
       } else {
-        messageBox.textContent = result.message;
-        messageBox.className = "message-box error";
+        setMessageBox(messageBox, "error", result.message);
       }
     });
 
@@ -429,7 +464,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll(".modal").forEach((modal) => {
     modal.addEventListener("click", (e) => {
       if (e.target === modal) {
-        modal.classList.remove("active");
+        closeModal(modal.id);
       }
     });
   });

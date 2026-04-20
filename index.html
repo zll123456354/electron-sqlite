@@ -1,158 +1,181 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>用户管理系统</title>
-    <link rel="stylesheet" href="styles.css" />
+    <script src="https://cdn.tailwindcss.com"></script>
   </head>
-  <body>
-    <div id="app">
+  <body class="min-h-screen bg-gradient-to-br from-indigo-500 via-purple-500 to-violet-600 p-6 text-slate-900">
+    <div id="app" class="min-h-[calc(100vh-3rem)]">
       <!-- 登录/注册页面 -->
       <div id="auth-section">
-        <div class="login-container">
-          <h1 style="text-align: center; color: #333; margin-bottom: 10px">
-            离线登录系统
-          </h1>
-          <p style="text-align: center; color: #888; margin-bottom: 30px">
-            📁 数据本地存储123456
-          </p>
+        <div class="login-container mx-auto mt-10 w-full max-w-md rounded-2xl border border-white/40 bg-white/95 p-8 shadow-2xl backdrop-blur">
+          <h1 class="text-center text-2xl font-semibold text-slate-800">离线登录系统</h1>
+          <p class="mt-2 text-center text-sm text-slate-500">📌 数据本地存储 123456</p>
 
-          <div class="tab-buttons">
-            <button class="tab-btn active" data-tab="login">登录</button>
-            <button class="tab-btn" data-tab="register">注册</button>
+          <div class="mt-6 rounded-xl bg-slate-100 p-1">
+            <div class="grid grid-cols-2 gap-2">
+              <button
+                class="tab-btn rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow transition"
+                data-tab="login"
+              >
+                登录
+              </button>
+              <button
+                class="tab-btn rounded-lg px-4 py-2 text-sm font-semibold text-slate-600 transition hover:text-slate-800"
+                data-tab="register"
+              >
+                注册
+              </button>
+            </div>
           </div>
 
-          <div id="login-form" style="z-index: 999;">
+          <div id="login-form" class="mt-6 space-y-5">
             <div class="form-group">
-              <label>用户名</label>
-              <div class="input-wrapper">
-                <span class="input-icon">👤</span>
+              <label class="text-sm font-medium text-slate-700">用户名</label>
+              <div class="input-wrapper relative mt-2">
+                <span class="input-icon absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">👤</span>
                 <input
                   type="text"
                   id="login-username"
+                  class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 pl-11 text-sm shadow-sm outline-none transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100"
                   placeholder="请输入用户名"
                 />
               </div>
             </div>
 
             <div class="form-group">
-              <label>密码</label>
-              <div class="input-wrapper">
-                <span class="input-icon">🔒</span>
+              <label class="text-sm font-medium text-slate-700">密码</label>
+              <div class="input-wrapper relative mt-2">
+                <span class="input-icon absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">🔒</span>
                 <input
                   type="password"
                   id="login-password"
+                  class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 pl-11 text-sm shadow-sm outline-none transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100"
                   placeholder="请输入密码"
                 />
               </div>
             </div>
 
-            <button class="submit-btn" id="login-submit">登 录</button>
+            <button
+              class="submit-btn w-full rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 py-3 text-sm font-semibold text-white shadow-lg transition hover:-translate-y-0.5 hover:shadow-xl"
+              id="login-submit"
+            >
+              登录
+            </button>
           </div>
 
-          <div id="register-form" style="display: none; z-index: 999;">
+          <div id="register-form" class="mt-6 hidden space-y-5">
             <div class="form-group">
-              <label>用户名</label>
-              <div class="input-wrapper">
-                <span class="input-icon">👤</span>
+              <label class="text-sm font-medium text-slate-700">用户名</label>
+              <div class="input-wrapper relative mt-2">
+                <span class="input-icon absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">👤</span>
                 <input
                   type="text"
                   id="register-username"
+                  class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 pl-11 text-sm shadow-sm outline-none transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100"
                   placeholder="至少3个字符"
                 />
               </div>
             </div>
 
             <div class="form-group">
-              <label>密码</label>
-              <div class="input-wrapper">
-                <span class="input-icon">🔒</span>
+              <label class="text-sm font-medium text-slate-700">密码</label>
+              <div class="input-wrapper relative mt-2">
+                <span class="input-icon absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">🔒</span>
                 <input
                   type="password"
                   id="register-password"
+                  class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 pl-11 text-sm shadow-sm outline-none transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100"
                   placeholder="至少6个字符"
                 />
               </div>
             </div>
 
             <div class="form-group">
-              <label>确认密码</label>
-              <div class="input-wrapper">
-                <span class="input-icon">✓</span>
+              <label class="text-sm font-medium text-slate-700">确认密码</label>
+              <div class="input-wrapper relative mt-2">
+                <span class="input-icon absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">✅</span>
                 <input
                   type="password"
                   id="register-confirm-password"
+                  class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 pl-11 text-sm shadow-sm outline-none transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100"
                   placeholder="再次输入密码"
                 />
               </div>
             </div>
 
-            <button class="submit-btn" id="register-submit">注 册</button>
+            <button
+              class="submit-btn w-full rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 py-3 text-sm font-semibold text-white shadow-lg transition hover:-translate-y-0.5 hover:shadow-xl"
+              id="register-submit"
+            >
+              注册
+            </button>
           </div>
 
-          <div class="message-box" id="auth-message"></div>
+          <div class="message-box hidden mt-4 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-600" id="auth-message"></div>
         </div>
       </div>
 
       <!-- 管理页面 -->
-      <div id="admin-section" style="display: none">
-        <div class="admin-container">
-          <div class="admin-header">
-            <h1>👥 用户管理系统</h1>
-            <div class="admin-header-right">
-              <div class="update-section">
-                <span class="update-status" id="update-status-text"></span>
-                <button class="btn btn-update" id="check-update-btn">检查更新</button>
+      <div id="admin-section" class="hidden">
+        <div class="admin-container mx-auto w-full max-w-6xl rounded-2xl border border-white/40 bg-white/95 p-6 shadow-2xl backdrop-blur">
+          <div class="admin-header flex flex-col gap-4 border-b border-slate-200 pb-4 lg:flex-row lg:items-center lg:justify-between">
+            <h1 class="text-xl font-semibold text-slate-800">👩‍💻 用户管理系统</h1>
+            <div class="admin-header-right flex flex-wrap items-center gap-3">
+              <div class="update-section flex items-center gap-2 rounded-full bg-slate-50 px-3 py-1">
+                <span class="update-status max-w-[260px] truncate text-xs text-slate-500" id="update-status-text"></span>
+                <button
+                  class="btn btn-update inline-flex items-center rounded-full bg-indigo-500 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-indigo-600 disabled:cursor-not-allowed disabled:bg-slate-300"
+                  id="check-update-btn"
+                >
+                  检查更新
+                </button>
               </div>
-              <div class="user-badge">
-                <div class="user-avatar" id="admin-avatar">U</div>
-                <span class="user-name" id="admin-username">管理员</span>
+              <div class="user-badge flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1">
+                <div class="user-avatar flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 text-sm font-semibold text-white" id="admin-avatar">U</div>
+                <span class="user-name text-sm font-medium text-slate-700" id="admin-username">管理员</span>
               </div>
-              <button class="logout-btn" id="admin-logout">退出登录</button>
+              <button
+                class="logout-btn rounded-full bg-rose-500 px-4 py-2 text-xs font-semibold text-white transition hover:bg-rose-600"
+                id="admin-logout"
+              >
+                退出登录
+              </button>
             </div>
           </div>
 
           <!-- 统计卡片 -->
-          <div class="stats-grid">
-            <div class="stat-card">
-              <h3>总用户数</h3>
-              <div class="stat-value" id="stat-total">0</div>
+          <div class="stats-grid mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div class="stat-card rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-500 p-5 text-white shadow-lg">
+              <h3 class="text-xs uppercase tracking-wide text-white/80">总用户数</h3>
+              <div class="stat-value mt-3 text-3xl font-semibold" id="stat-total">0</div>
             </div>
-            <div
-              class="stat-card"
-              style="
-                background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%);
-              "
-            >
-              <h3>启用用户</h3>
-              <div class="stat-value" id="stat-active">0</div>
+            <div class="stat-card rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-700 p-5 text-white shadow-lg">
+              <h3 class="text-xs uppercase tracking-wide text-white/80">启用用户</h3>
+              <div class="stat-value mt-3 text-3xl font-semibold" id="stat-active">0</div>
             </div>
-            <div
-              class="stat-card"
-              style="
-                background: linear-gradient(135deg, #f44336 0%, #c62828 100%);
-              "
-            >
-              <h3>禁用用户</h3>
-              <div class="stat-value" id="stat-disabled">0</div>
+            <div class="stat-card rounded-2xl bg-gradient-to-br from-rose-500 to-rose-700 p-5 text-white shadow-lg">
+              <h3 class="text-xs uppercase tracking-wide text-white/80">禁用用户</h3>
+              <div class="stat-value mt-3 text-3xl font-semibold" id="stat-disabled">0</div>
             </div>
           </div>
 
           <!-- 用户表格 -->
-          <div class="users-table-container">
-            <table class="users-table">
-              <thead>
+          <div class="users-table-container mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg">
+            <table class="users-table w-full text-sm">
+              <thead class="bg-slate-50 text-xs font-semibold uppercase tracking-wide text-slate-500">
                 <tr>
-                  <th>ID</th>
-                  <th>用户名</th>
-                  <th>状态</th>
-                  <th>注册时间</th>
-                  <th>最后登录</th>
-                  <th>操作</th>
+                  <th class="px-4 py-3 text-left">ID</th>
+                  <th class="px-4 py-3 text-left">用户名</th>
+                  <th class="px-4 py-3 text-left">状态</th>
+                  <th class="px-4 py-3 text-left">注册时间</th>
+                  <th class="px-4 py-3 text-left">最后登录</th>
+                  <th class="px-4 py-3 text-left">操作</th>
                 </tr>
               </thead>
-              <tbody id="users-table-body">
+              <tbody id="users-table-body" class="divide-y divide-slate-100 text-slate-700">
                 <!-- 动态填充 -->
               </tbody>
             </table>
@@ -161,49 +184,47 @@
       </div>
 
       <!-- 修改密码模态框 -->
-      <div class="modal" id="change-password-modal">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h3>修改密码</h3>
-            <span
-              class="modal-close"
-              onclick="closeModal('change-password-modal')"
-              >&times;</span
-            >
+      <div class="modal hidden fixed inset-0 z-50 items-center justify-center bg-slate-900/50 p-4 backdrop-blur" id="change-password-modal">
+        <div class="modal-content w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
+          <div class="modal-header flex items-center justify-between">
+            <h3 class="text-lg font-semibold text-slate-800">修改密码</h3>
+            <span class="modal-close cursor-pointer text-2xl text-slate-400 transition hover:text-slate-700" onclick="closeModal('change-password-modal')">&times;</span>
           </div>
-          <div class="form-group">
-            <label>原密码</label>
-            <input
-              type="password"
-              class="form-control"
-              id="modal-old-password"
-              placeholder="请输入原密码"
-            />
+          <div class="mt-4 space-y-4">
+            <div class="form-group">
+              <label class="text-sm font-medium text-slate-700">原密码</label>
+              <input
+                type="password"
+                class="form-control mt-2 w-full rounded-xl border border-slate-200 px-4 py-2 text-sm shadow-sm outline-none transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100"
+                id="modal-old-password"
+                placeholder="请输入原密码"
+              />
+            </div>
+            <div class="form-group">
+              <label class="text-sm font-medium text-slate-700">新密码</label>
+              <input
+                type="password"
+                class="form-control mt-2 w-full rounded-xl border border-slate-200 px-4 py-2 text-sm shadow-sm outline-none transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100"
+                id="modal-new-password"
+                placeholder="至少6个字符"
+              />
+            </div>
+            <div class="form-group">
+              <label class="text-sm font-medium text-slate-700">确认新密码</label>
+              <input
+                type="password"
+                class="form-control mt-2 w-full rounded-xl border border-slate-200 px-4 py-2 text-sm shadow-sm outline-none transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100"
+                id="modal-confirm-password"
+                placeholder="再次输入新密码"
+              />
+            </div>
           </div>
-          <div class="form-group">
-            <label>新密码</label>
-            <input
-              type="password"
-              class="form-control"
-              id="modal-new-password"
-              placeholder="至少6个字符"
-            />
-          </div>
-          <div class="form-group">
-            <label>确认新密码</label>
-            <input
-              type="password"
-              class="form-control"
-              id="modal-confirm-password"
-              placeholder="再次输入新密码"
-            />
-          </div>
-          <div class="message-box" id="modal-message"></div>
-          <div class="modal-footer">
-            <button class="btn" onclick="closeModal('change-password-modal')">
+          <div class="message-box hidden mt-4 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-600" id="modal-message"></div>
+          <div class="modal-footer mt-6 flex justify-end gap-2">
+            <button class="btn rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-50" onclick="closeModal('change-password-modal')">
               取消
             </button>
-            <button class="btn btn-primary" onclick="submitChangePassword()">
+            <button class="btn btn-primary rounded-xl bg-indigo-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-600" onclick="submitChangePassword()">
               确认修改
             </button>
           </div>
@@ -211,31 +232,29 @@
       </div>
 
       <!-- 重置密码模态框 -->
-      <div class="modal" id="reset-password-modal">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h3>重置用户密码</h3>
-            <span
-              class="modal-close"
-              onclick="closeModal('reset-password-modal')"
-              >&times;</span
-            >
+      <div class="modal hidden fixed inset-0 z-50 items-center justify-center bg-slate-900/50 p-4 backdrop-blur" id="reset-password-modal">
+        <div class="modal-content w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
+          <div class="modal-header flex items-center justify-between">
+            <h3 class="text-lg font-semibold text-slate-800">重置用户密码</h3>
+            <span class="modal-close cursor-pointer text-2xl text-slate-400 transition hover:text-slate-700" onclick="closeModal('reset-password-modal')">&times;</span>
           </div>
-          <div class="form-group">
-            <label>新密码</label>
-            <input
-              type="password"
-              class="form-control"
-              id="reset-new-password"
-              placeholder="至少6个字符"
-            />
+          <div class="mt-4 space-y-4">
+            <div class="form-group">
+              <label class="text-sm font-medium text-slate-700">新密码</label>
+              <input
+                type="password"
+                class="form-control mt-2 w-full rounded-xl border border-slate-200 px-4 py-2 text-sm shadow-sm outline-none transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100"
+                id="reset-new-password"
+                placeholder="至少6个字符"
+              />
+            </div>
           </div>
-          <div class="message-box" id="reset-modal-message"></div>
-          <div class="modal-footer">
-            <button class="btn" onclick="closeModal('reset-password-modal')">
+          <div class="message-box hidden mt-4 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-600" id="reset-modal-message"></div>
+          <div class="modal-footer mt-6 flex justify-end gap-2">
+            <button class="btn rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-50" onclick="closeModal('reset-password-modal')">
               取消
             </button>
-            <button class="btn btn-primary" onclick="submitResetPassword()">
+            <button class="btn btn-primary rounded-xl bg-indigo-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-600" onclick="submitResetPassword()">
               确认重置
             </button>
           </div>
@@ -243,17 +262,17 @@
       </div>
 
       <!-- 消息提示模态框 -->
-      <div class="modal" id="message-modal">
-        <div class="modal-content modal-small">
+      <div class="modal hidden fixed inset-0 z-50 items-center justify-center bg-slate-900/50 p-4 backdrop-blur" id="message-modal">
+        <div class="modal-content w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl">
           <div class="modal-header">
-            <h3 id="message-modal-title">提示</h3>
+            <h3 class="text-lg font-semibold text-slate-800" id="message-modal-title">提示</h3>
           </div>
-          <div class="message-box" id="message-modal-content"></div>
-          <div class="modal-footer">
-            <button class="btn" onclick="closeModal('message-modal')">
+          <div class="message-box mt-4 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-600" id="message-modal-content"></div>
+          <div class="modal-footer mt-6 flex justify-end gap-2">
+            <button class="btn rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-50" onclick="closeModal('message-modal')">
               取消
             </button>
-            <button class="btn btn-primary" id="message-modal-confirm-btn" onclick="executeConfirmAction()">
+            <button class="btn btn-primary rounded-xl bg-indigo-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-600" id="message-modal-confirm-btn" onclick="executeConfirmAction()">
               确定
             </button>
           </div>
