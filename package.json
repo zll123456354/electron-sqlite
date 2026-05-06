@@ -1,15 +1,15 @@
 {
   "name": "electron-sqlite-login",
-  "version": "1.0.8",
+  "version": "1.0.7",
   "description": "用户管理系统",
-  "main": "main.js",
+  "main": "electron/main.js",
   "scripts": {
-    "start": "npm run tw:build && electron .",
-    "tw:build": "npx @tailwindcss/cli -i ./styles.css -o ./styles.generated.css",
-    "tw:watch": "npx @tailwindcss/cli -i ./styles.css -o ./styles.generated.css --watch",
-    "dist": "electron-builder",
-    "dist:dir": "electron-builder --dir",
-    "publish": "electron-builder --publish always"
+    "dev": "concurrently \"vite\" \"wait-on http://localhost:5173 && electron . --dev\"",
+    "build": "vite build",
+    "start": "npm run build && electron .",
+    "dist": "npm run build && electron-builder",
+    "dist:dir": "npm run build && electron-builder --dir",
+    "publish": "npm run build && electron-builder --publish always"
   },
   "author": "Your Name",
   "license": "ISC",
@@ -17,13 +17,18 @@
     "bcryptjs": "^2.4.3",
     "electron-updater": "^6.6.2",
     "sql.js": "^1.10.3",
-    "update-electron-app": "^3.1.2"
+    "update-electron-app": "^3.1.2",
+    "vue": "^3.5.13"
   },
   "devDependencies": {
-    "@tailwindcss/cli": "^4.2.2",
+    "@tailwindcss/vite": "^4.2.2",
+    "@vitejs/plugin-vue": "^5.2.3",
+    "concurrently": "^9.2.1",
     "electron": "^27.3.11",
     "electron-builder": "^24.13.3",
-    "tailwindcss": "^4.2.2"
+    "tailwindcss": "^4.2.2",
+    "vite": "^6.3.3",
+    "wait-on": "^8.0.5"
   },
   "build": {
     "appId": "com.example.useradmin",
@@ -37,19 +42,18 @@
       }
     ],
     "directories": {
-      "output": "dist"
+      "output": "dist/package"
     },
     "asar": true,
     "asarUnpack": [
       "node_modules/sql.js/**/*"
     ],
     "files": [
-      "**/*",
-      "!*.md",
-      "!*.log",
-      "!.gitignore",
+      "electron/**/*",
+      "dist/renderer/**/*",
+      "node_modules/**/*",
       "!node_modules/.cache/**",
-      "!dist/**"
+      "!dist/package/**"
     ],
     "win": {
       "target": "nsis",
