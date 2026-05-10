@@ -2,7 +2,18 @@
   <div class="h-screen overflow-hidden bg-gradient-to-br from-indigo-500 via-purple-500 to-violet-600 p-6 text-slate-900">
     <div class="flex h-full items-center justify-center">
       <AuthSection v-if="!currentUser" @login="handleLogin" />
-      <AdminSection v-else :user="currentUser" @logout="handleLogout" />
+      <ProfileSection 
+        v-else-if="currentPage === 'profile'" 
+        :user="currentUser" 
+        @back="currentPage = 'admin'"
+        @update="handleProfileUpdate"
+      />
+      <AdminSection 
+        v-else 
+        :user="currentUser" 
+        @logout="handleLogout"
+        @goProfile="currentPage = 'profile'"
+      />
     </div>
   </div>
 </template>
@@ -11,8 +22,10 @@
 import { ref, onMounted } from 'vue'
 import AuthSection from './components/AuthSection.vue'
 import AdminSection from './components/AdminSection.vue'
+import ProfileSection from './components/ProfileSection.vue'
 
 const currentUser = ref(null)
+const currentPage = ref('admin') // 'admin' | 'profile'
 
 onMounted(() => {
   const savedUser = localStorage.getItem('currentUser')
@@ -28,6 +41,12 @@ const handleLogin = (user) => {
 
 const handleLogout = () => {
   currentUser.value = null
+  currentPage.value = 'admin'
   localStorage.removeItem('currentUser')
+}
+
+const handleProfileUpdate = (updatedUser) => {
+  currentUser.value = updatedUser
+  localStorage.setItem('currentUser', JSON.stringify(updatedUser))
 }
 </script>

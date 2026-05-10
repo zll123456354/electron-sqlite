@@ -12,17 +12,40 @@
             {{ updateChecking ? '检查中...' : '检查更新' }}
           </button>
         </div>
-        <!-- 用户信息 -->
-        <div class="flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1">
-          <div class="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 text-sm font-semibold text-white">
-            {{ user.username.charAt(0).toUpperCase() }}
+        <!-- 用户头像下拉菜单 -->
+        <div class="relative">
+          <button @click="showUserMenu = !showUserMenu" 
+            class="flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 transition hover:bg-slate-200">
+            <div class="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 text-sm font-semibold text-white">
+              {{ user.username.charAt(0).toUpperCase() }}
+            </div>
+            <span class="text-sm font-medium text-slate-700">{{ user.username }}</span>
+            <svg class="h-4 w-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+          
+          <!-- 下拉菜单 -->
+          <div v-if="showUserMenu" 
+            class="absolute right-0 top-full z-50 mt-2 w-40 rounded-xl border border-slate-200 bg-white py-2 shadow-xl"
+            @click="showUserMenu = false">
+            <button @click="goProfile" 
+              class="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-slate-700 transition hover:bg-slate-50">
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+              个人中心
+            </button>
+            <div class="my-1 border-t border-slate-100"></div>
+            <button @click="confirmLogout" 
+              class="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-rose-600 transition hover:bg-rose-50">
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+              退出登录
+            </button>
           </div>
-          <span class="text-sm font-medium text-slate-700">{{ user.username }}</span>
         </div>
-        <button @click="confirmLogout"
-          class="rounded-full bg-rose-500 px-4 py-2 text-xs font-semibold text-white transition hover:bg-rose-600">
-          退出登录
-        </button>
       </div>
     </div>
 
@@ -117,9 +140,10 @@ import ResetPasswordModal from './modals/ResetPasswordModal.vue'
 import ConfirmModal from './modals/ConfirmModal.vue'
 
 const props = defineProps({ user: Object })
-const emit = defineEmits(['logout'])
+const emit = defineEmits(['logout', 'goProfile'])
 
 const users = ref([])
+const showUserMenu = ref(false)
 const updateStatus = ref('')
 const updateChecking = ref(false)
 const showChangePassword = ref(false)
@@ -134,7 +158,12 @@ const stats = computed(() => ({
 }))
 
 const loadUsers = async () => {
-  users.value = await window.electronAPI.getAllUsers()
+  const result = await window.electronAPI.getAllUsers()
+  if (result.success) {
+    users.value = result.data
+  } else {
+    users.value = []
+  }
 }
 
 const checkUpdate = () => {
@@ -181,6 +210,10 @@ const openResetPassword = (u) => {
   resetTarget.id = u.id
   resetTarget.username = u.username
   showResetPassword.value = true
+}
+
+const goProfile = () => {
+  emit('goProfile')
 }
 
 onMounted(() => {
