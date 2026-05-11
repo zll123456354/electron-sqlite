@@ -164,9 +164,16 @@ const showMsg = (text, type) => {
 }
 
 const saveProfile = async () => {
+  const username = form.username.trim()
+  if (!username) {
+    showMsg('用户名不能为空', 'error')
+    return
+  }
+
   saving.value = true
   try {
     const result = await window.electronAPI.updateProfile(props.user.id, {
+      username,
       nickname: form.nickname,
       gender: form.gender,
       age: form.age,
@@ -176,8 +183,7 @@ const saveProfile = async () => {
 
     if (result.success) {
       showMsg('保存成功', 'success')
-      // 更新本地用户信息
-      emit('update', { ...props.user, ...form })
+      emit('update', result.user || { ...props.user, ...form, username })
     } else {
       showMsg(result.message || '保存失败', 'error')
     }

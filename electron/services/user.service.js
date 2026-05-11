@@ -63,6 +63,13 @@ async function login(username, password) {
       id: user.id,
       username: user.username,
       status: user.status,
+      created_at: user.created_at,
+      last_login: user.last_login,
+      nickname: user.nickname,
+      age: user.age,
+      birthday: user.birthday,
+      gender: user.gender,
+      avatar: user.avatar,
     },
     message: '登录成功',
   };
@@ -71,6 +78,21 @@ async function login(username, password) {
 // 获取用户列表
 async function getAllUsers() {
   return await userModel.findAll();
+}
+
+// 根据 ID 获取当前用户信息
+async function getUserById(userId) {
+  if (!userId) {
+    throw new Error('用户ID不能为空');
+  }
+
+  const user = await userModel.findById(userId);
+  if (!user) {
+    throw new Error('用户不存在');
+  }
+
+  const { password, ...userInfo } = user;
+  return userInfo;
 }
 
 // 删除用户
@@ -139,11 +161,26 @@ async function updateProfile(userId, profile) {
   if (!userId || !profile) {
     throw new Error('参数不完整');
   }
+
+  const username = (profile.username || '').trim();
+  if (!username) {
+    throw new Error('用户名不能为空');
+  }
+
+  const existingUser = await userModel.findByUsername(username);
+  if (existingUser && existingUser.id !== userId) {
+    throw new Error('用户名已存在');
+  }
+
   await userModel.updateProfile({
     id: userId,
     ...profile,
+    username,
   });
-  return { message: '个人信息更新成功' };
+
+  const user = await userModel.findById(userId);
+  const { password, ...userInfo } = user;
+  return { message: '个人信息更新成功', user: userInfo };
 }
 
 // 更新用户头像
@@ -161,6 +198,7 @@ module.exports = {
   register,
   login,
   getAllUsers,
+  getUserById,
   deleteUser,
   toggleStatus,
   changePassword,

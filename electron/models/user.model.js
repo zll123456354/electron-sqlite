@@ -48,7 +48,7 @@ function createTable() {
 // 查询所有用户
 function findAll() {
   const result = query(`
-    SELECT id, username, status, created_at, last_login 
+    SELECT id, username, status, created_at, last_login, nickname, age, birthday, gender, avatar 
     FROM ${TABLE_NAME} 
     ORDER BY created_at DESC
   `);
@@ -61,6 +61,11 @@ function findAll() {
     status: row[2],
     created_at: row[3],
     last_login: row[4],
+    nickname: row[5],
+    age: row[6],
+    birthday: row[7],
+    gender: row[8],
+    avatar: row[9],
   }));
 }
 
@@ -77,6 +82,11 @@ function findById(id) {
     status: row[3],
     created_at: row[4],
     last_login: row[5],
+    nickname: row[6],
+    age: row[7],
+    birthday: row[8],
+    gender: row[9],
+    avatar: row[10],
   };
 }
 
@@ -95,6 +105,11 @@ function findByUsername(username) {
     status: row[3],
     created_at: row[4],
     last_login: row[5],
+    nickname: row[6],
+    age: row[7],
+    birthday: row[8],
+    gender: row[9],
+    avatar: row[10],
   };
 }
 
@@ -112,10 +127,11 @@ function create(data) {
 function updateProfile(data) {
   const sql = `
     UPDATE ${TABLE_NAME}
-    SET nickname = ?, age = ?, birthday = ?, gender = ?, avatar = ?
+    SET username = ?, nickname = ?, age = ?, birthday = ?, gender = ?, avatar = ?
     WHERE id = ?
   `;
   run(sql, [
+    data.username,
     data.nickname,
     data.age,
     data.birthday,

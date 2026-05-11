@@ -1,5 +1,6 @@
 <template>
-  <div class="admin-container mx-auto w-full max-w-6xl rounded-2xl border border-white/40 bg-white/95 p-6 shadow-2xl backdrop-blur">
+  <div
+    class="admin-container mx-auto w-full max-w-6xl rounded-2xl border border-white/40 bg-white/95 p-6 shadow-2xl backdrop-blur">
     <!-- 头部 -->
     <div class="flex flex-col gap-4 border-b border-slate-200 pb-4 lg:flex-row lg:items-center lg:justify-between">
       <h1 class="text-xl font-semibold text-slate-800">👩‍💻 用户管理系统</h1>
@@ -14,33 +15,37 @@
         </div>
         <!-- 用户头像下拉菜单 -->
         <div class="relative">
-          <button @click="showUserMenu = !showUserMenu" 
+          <button @click="showUserMenu = !showUserMenu"
             class="flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 transition hover:bg-slate-200">
-            <div class="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 text-sm font-semibold text-white">
-              {{ user.username.charAt(0).toUpperCase() }}
+            <div
+              class="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 text-sm font-semibold text-white overflow-hidden">
+              <img v-if="user.avatar" :src="user.avatar" class="h-full w-full object-cover" />
+              <span v-else>{{ user.username.charAt(0).toUpperCase() }}</span>
             </div>
             <span class="text-sm font-medium text-slate-700">{{ user.username }}</span>
             <svg class="h-4 w-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
             </svg>
           </button>
-          
+
           <!-- 下拉菜单 -->
-          <div v-if="showUserMenu" 
+          <div v-if="showUserMenu"
             class="absolute right-0 top-full z-50 mt-2 w-40 rounded-xl border border-slate-200 bg-white py-2 shadow-xl"
             @click="showUserMenu = false">
-            <button @click="goProfile" 
+            <button @click="goProfile"
               class="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-slate-700 transition hover:bg-slate-50">
               <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
               </svg>
               个人中心
             </button>
             <div class="my-1 border-t border-slate-100"></div>
-            <button @click="confirmLogout" 
+            <button @click="confirmLogout"
               class="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-rose-600 transition hover:bg-rose-50">
               <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
               </svg>
               退出登录
             </button>
@@ -71,6 +76,7 @@
         <thead class="bg-slate-50 text-xs font-semibold uppercase tracking-wide text-slate-500">
           <tr>
             <th class="px-4 py-3 text-left">ID</th>
+            <th class="px-4 py-3 text-left">头像</th>
             <th class="px-4 py-3 text-left">用户名</th>
             <th class="px-4 py-3 text-left">状态</th>
             <th class="px-4 py-3 text-left">注册时间</th>
@@ -80,7 +86,7 @@
         </thead>
         <tbody class="divide-y divide-slate-100 text-slate-700">
           <tr v-if="users.length === 0">
-            <td colspan="6" class="px-6 py-10">
+            <td colspan="7" class="px-6 py-10">
               <div class="flex flex-col items-center gap-2 text-slate-400">
                 <div class="text-3xl">📭</div>
                 <p class="text-sm">暂无用户数据</p>
@@ -89,6 +95,13 @@
           </tr>
           <tr v-for="u in users" :key="u.id" class="hover:bg-slate-50 transition">
             <td class="px-4 py-3">{{ u.id }}</td>
+            <td class="px-4 py-3">
+              <div
+                class="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 text-sm font-semibold text-white">
+                <img v-if="u.avatar" :src="u.avatar" class="h-full w-full object-cover" />
+                <span v-else>{{ getUserInitial(u) }}</span>
+              </div>
+            </td>
             <td class="px-4 py-3 font-medium text-slate-800">{{ u.username }}</td>
             <td class="px-4 py-3">
               <span class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold"
@@ -96,8 +109,10 @@
                 {{ u.status === 'disabled' ? '禁用' : '启用' }}
               </span>
             </td>
-            <td class="px-4 py-3 text-slate-500">{{ u.created_at ? new Date(u.created_at).toLocaleString('zh-CN') : '-' }}</td>
-            <td class="px-4 py-3 text-slate-500">{{ u.last_login ? new Date(u.last_login).toLocaleString('zh-CN') : '从未登录' }}</td>
+            <td class="px-4 py-3 text-slate-500">{{ u.created_at ? new Date(u.created_at).toLocaleString('zh-CN') : '-'
+              }}</td>
+            <td class="px-4 py-3 text-slate-500">{{ u.last_login ? new Date(u.last_login).toLocaleString('zh-CN') :
+              '从未登录' }}</td>
             <td class="px-4 py-3">
               <div class="flex flex-wrap gap-2">
                 <button @click="confirmToggle(u)"
@@ -140,7 +155,7 @@ import ResetPasswordModal from './modals/ResetPasswordModal.vue'
 import ConfirmModal from './modals/ConfirmModal.vue'
 
 const props = defineProps({ user: Object })
-const emit = defineEmits(['logout', 'goProfile'])
+const emit = defineEmits(['logout', 'goProfile', 'update-user'])
 
 const users = ref([])
 const showUserMenu = ref(false)
@@ -149,7 +164,7 @@ const updateChecking = ref(false)
 const showChangePassword = ref(false)
 const showResetPassword = ref(false)
 const resetTarget = reactive({ id: null, username: '' })
-const confirmModal = reactive({ show: false, title: '', content: '', type: 'neutral', action: () => {} })
+const confirmModal = reactive({ show: false, title: '', content: '', type: 'neutral', action: () => { } })
 
 const stats = computed(() => ({
   total: users.value.length,
@@ -161,9 +176,18 @@ const loadUsers = async () => {
   const result = await window.electronAPI.getAllUsers()
   if (result.success) {
     users.value = result.data
+    const currentUser = result.data.find(u => u.id === props.user.id)
+    if (currentUser) {
+      emit('update-user', { ...props.user, ...currentUser })
+    }
   } else {
     users.value = []
   }
+}
+
+const getUserInitial = (u) => {
+  const name = u.nickname || u.username || ''
+  return name ? name.charAt(0).toUpperCase() : '?'
 }
 
 const checkUpdate = () => {

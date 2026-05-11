@@ -50,6 +50,20 @@ function registerUserHandlers() {
     }
   });
 
+  // 根据 ID 获取用户
+  ipcMain.handle('user:getById', async (event, userId) => {
+    try {
+      const user = await userService.getUserById(userId);
+      const res = { success: true, user };
+      logIpc('user:getById', { userId }, res);
+      return res;
+    } catch (err) {
+      const res = { success: false, message: err.message };
+      logIpc('user:getById', { userId }, res);
+      return res;
+    }
+  });
+
   // 删除用户
   ipcMain.handle('user:delete', async (event, userId) => {
     try {

@@ -13,6 +13,7 @@
         :user="currentUser" 
         @logout="handleLogout"
         @goProfile="currentPage = 'profile'"
+        @update-user="handleProfileUpdate"
       />
     </div>
   </div>
@@ -24,29 +25,61 @@ import AuthSection from './components/AuthSection.vue'
 import AdminSection from './components/AdminSection.vue'
 import ProfileSection from './components/ProfileSection.vue'
 
+const CURRENT_USER_ID_KEY = 'currentUserId'
+const LEGACY_CURRENT_USER_KEY = 'currentUser'
+
 const currentUser = ref(null)
 const currentPage = ref('admin') // 'admin' | 'profile'
 
-onMounted(() => {
-  const savedUser = localStorage.getItem('currentUser')
-  if (savedUser) {
-    currentUser.value = JSON.parse(savedUser)
+const loadCurrentUser = async () => {
+  const savedUserId = localStorage.getItem(CURRENT_USER_ID_KEY)
+  const legacySavedUser = localStorage.getItem(LEGACY_CURRENT_USER_KEY)
+  let legacyUserId = null
+
+  if (legacySavedUser) {
+    try {
+      legacyUserId = JSON.parse(legacySavedUser).id
+    } catch {
+      legacyUserId = null
+    }
   }
+
+  const userId = savedUserId || legacyUserId
+
+  localStorage.removeItem(LEGACY_CURRENT_USER_KEY)
+
+  if (!userId) return
+
+  const result = await window.electronAPI.getUserById(Number(userId))
+  if (result.success) {
+    currentUser.value = result.user
+    localStorage.setItem(CURRENT_USER_ID_KEY, String(result.user.id))
+  } else {
+    currentUser.value = null
+    localStorage.removeItem(CURRENT_USER_ID_KEY)
+  }
+}
+
+onMounted(() => {
+  loadCurrentUser()
 })
 
 const handleLogin = (user) => {
   currentUser.value = user
-  localStorage.setItem('currentUser', JSON.stringify(user))
+  localStorage.setItem(CURRENT_USER_ID_KEY, String(user.id))
+  localStorage.removeItem(LEGACY_CURRENT_USER_KEY)
 }
 
 const handleLogout = () => {
   currentUser.value = null
   currentPage.value = 'admin'
-  localStorage.removeItem('currentUser')
+  localStorage.removeItem(CURRENT_USER_ID_KEY)
+  localStorage.removeItem(LEGACY_CURRENT_USER_KEY)
 }
 
 const handleProfileUpdate = (updatedUser) => {
   currentUser.value = updatedUser
-  localStorage.setItem('currentUser', JSON.stringify(updatedUser))
+  localStorage.setItem(CURRENT_USER_ID_KEY, String(updatedUser.id))
+  localStorage.removeItem(LEGACY_CURRENT_USER_KEY)
 }
 </script>

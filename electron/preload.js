@@ -9,6 +9,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
   // 用户管理相关
   getAllUsers: () => ipcRenderer.invoke('user:getAll'),
+  getUserById: (userId) => ipcRenderer.invoke('user:getById', userId),
   deleteUser: (userId) => ipcRenderer.invoke('user:delete', userId),
   toggleUserStatus: (userId, status) =>
     ipcRenderer.invoke('user:toggleStatus', userId, status),
