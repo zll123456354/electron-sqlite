@@ -1,6 +1,6 @@
 {
   "name": "electron-sqlite-login",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "用户管理系统",
   "main": "electron/main.js",
   "scripts": {
