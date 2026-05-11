@@ -1,4 +1,4 @@
-const { query, run } = require('../db');
+const { query, run, mapRows, mapRow } = require('../db');
 
 // 表名
 const TABLE_NAME = 'orders';
@@ -45,30 +45,13 @@ function findAll() {
     ORDER BY o.created_at DESC
   `);
   
-  if (result.length === 0) return [];
-  
-  return result[0].values.map((row) => ({
-    id: row[0],
-    user_id: row[1],
-    total_amount: row[2],
-    status: row[3],
-    created_at: row[4],
-    username: row[5],
-  }));
+  return mapRows(result);
 }
 
 // 根据用户 ID 查询订单
 function findByUserId(userId) {
   const result = query(`SELECT * FROM ${TABLE_NAME} WHERE user_id = ? ORDER BY created_at DESC`, [userId]);
-  if (result.length === 0) return [];
-  
-  return result[0].values.map((row) => ({
-    id: row[0],
-    user_id: row[1],
-    total_amount: row[2],
-    status: row[3],
-    created_at: row[4],
-  }));
+  return mapRows(result);
 }
 
 // 查询订单详情（包含商品明细）
@@ -77,7 +60,7 @@ function findById(id) {
   const orderResult = query(`SELECT * FROM ${TABLE_NAME} WHERE id = ?`, [id]);
   if (orderResult.length === 0 || orderResult[0].values.length === 0) return null;
   
-  const orderRow = orderResult[0].values[0];
+  const order = mapRow(orderResult[0].values[0], orderResult[0].columns);
   
   // 查询订单商品明细
   const itemsResult = query(`
@@ -87,25 +70,9 @@ function findById(id) {
     WHERE oi.order_id = ?
   `, [id]);
   
-  const items = itemsResult.length > 0 
-    ? itemsResult[0].values.map((row) => ({
-        id: row[0],
-        order_id: row[1],
-        product_id: row[2],
-        quantity: row[3],
-        unit_price: row[4],
-        product_name: row[5],
-      }))
-    : [];
+  order.items = mapRows(itemsResult);
   
-  return {
-    id: orderRow[0],
-    user_id: orderRow[1],
-    total_amount: orderRow[2],
-    status: orderRow[3],
-    created_at: orderRow[4],
-    items,
-  };
+  return order;
 }
 
 // 创建订单

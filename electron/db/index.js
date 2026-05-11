@@ -74,6 +74,20 @@ function getTableInfo(tableName) {
   return query(`PRAGMA table_info(${tableName})`);
 }
 
+// 将 sql.js 查询结果的行按列名映射为对象
+function mapRow(row, columns) {
+  const obj = {};
+  columns.forEach((col, i) => { obj[col] = row[i] });
+  return obj;
+}
+
+// 将查询结果的所有行映射为对象数组
+function mapRows(result) {
+  if (result.length === 0) return [];
+  const columns = result[0].columns;
+  return result[0].values.map((row) => mapRow(row, columns));
+}
+
 module.exports = {
   initDatabase,
   getDb,
@@ -81,4 +95,6 @@ module.exports = {
   query,
   run,
   getTableInfo,
+  mapRow,
+  mapRows,
 };

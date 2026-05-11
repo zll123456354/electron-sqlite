@@ -1,4 +1,4 @@
-const { query, run, getTableInfo } = require("../db");
+const { query, run, getTableInfo, mapRows, mapRow } = require("../db");
 
 // 表名
 const TABLE_NAME = "users";
@@ -53,20 +53,7 @@ function findAll() {
     ORDER BY created_at DESC
   `);
 
-  if (result.length === 0) return [];
-
-  return result[0].values.map((row) => ({
-    id: row[0],
-    username: row[1],
-    status: row[2],
-    created_at: row[3],
-    last_login: row[4],
-    nickname: row[5],
-    age: row[6],
-    birthday: row[7],
-    gender: row[8],
-    avatar: row[9],
-  }));
+  return mapRows(result);
 }
 
 // 根据 ID 查询用户
@@ -74,20 +61,7 @@ function findById(id) {
   const result = query(`SELECT * FROM ${TABLE_NAME} WHERE id = ?`, [id]);
   if (result.length === 0 || result[0].values.length === 0) return null;
 
-  const row = result[0].values[0];
-  return {
-    id: row[0],
-    username: row[1],
-    password: row[2],
-    status: row[3],
-    created_at: row[4],
-    last_login: row[5],
-    nickname: row[6],
-    age: row[7],
-    birthday: row[8],
-    gender: row[9],
-    avatar: row[10],
-  };
+  return mapRow(result[0].values[0], result[0].columns);
 }
 
 // 根据用户名查询用户
@@ -97,20 +71,7 @@ function findByUsername(username) {
   ]);
   if (result.length === 0 || result[0].values.length === 0) return null;
 
-  const row = result[0].values[0];
-  return {
-    id: row[0],
-    username: row[1],
-    password: row[2],
-    status: row[3],
-    created_at: row[4],
-    last_login: row[5],
-    nickname: row[6],
-    age: row[7],
-    birthday: row[8],
-    gender: row[9],
-    avatar: row[10],
-  };
+  return mapRow(result[0].values[0], result[0].columns);
 }
 
 // 创建用户

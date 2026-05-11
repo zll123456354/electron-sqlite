@@ -1,4 +1,4 @@
-const { query, run, getTableInfo } = require('../db');
+const { query, run, getTableInfo, mapRows, mapRow } = require('../db');
 
 // 表名
 const TABLE_NAME = 'products';
@@ -23,17 +23,7 @@ function createTable() {
 // 查询所有商品
 function findAll() {
   const result = query(`SELECT * FROM ${TABLE_NAME} ORDER BY created_at DESC`);
-  if (result.length === 0) return [];
-  
-  return result[0].values.map((row) => ({
-    id: row[0],
-    name: row[1],
-    price: row[2],
-    stock: row[3],
-    description: row[4],
-    status: row[5],
-    created_at: row[6],
-  }));
+  return mapRows(result);
 }
 
 // 根据 ID 查询商品
@@ -41,16 +31,7 @@ function findById(id) {
   const result = query(`SELECT * FROM ${TABLE_NAME} WHERE id = ?`, [id]);
   if (result.length === 0 || result[0].values.length === 0) return null;
   
-  const row = result[0].values[0];
-  return {
-    id: row[0],
-    name: row[1],
-    price: row[2],
-    stock: row[3],
-    description: row[4],
-    status: row[5],
-    created_at: row[6],
-  };
+  return mapRow(result[0].values[0], result[0].columns);
 }
 
 // 创建商品

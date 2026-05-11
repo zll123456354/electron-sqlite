@@ -4,12 +4,13 @@
   "description": "用户管理系统",
   "main": "electron/main.js",
   "scripts": {
+    "generate:update-notes": "node scripts/generate-update-notes.js",
     "dev": "concurrently \"vite\" \"wait-on http://localhost:5173 && electron . --dev\"",
     "build": "vite build",
     "start": "npm run build && electron .",
-    "dist": "npm run build && electron-builder",
-    "dist:dir": "npm run build && electron-builder --dir",
-    "publish": "npm run build && electron-builder --publish always"
+    "dist": "npm run generate:update-notes && npm run build && electron-builder",
+    "dist:dir": "npm run generate:update-notes && npm run build && electron-builder --dir",
+    "publish": "npm run generate:update-notes && npm run build && electron-builder --publish always"
   },
   "author": "Your Name",
   "license": "ISC",
